@@ -58,8 +58,8 @@ function new()
         uimenu(hmenu,'Label','&non-improved algorithm','Callback',@start_noimprove,'separator','on','Accelerator','S');
     
     %the two plots
-    astar_axes = axes('tag','astar','unit', 'normalized', 'position', [0.025 0.1 0.45 0.8]); 
-    nav_axes = axes('tag','nav','unit', 'normalized', 'position', [0.525 0.1 0.45 0.8]);
+    axes('tag','astar','unit', 'normalized', 'position', [0.025 0.1 0.45 0.8]); 
+    axes('tag','nav','unit', 'normalized', 'position', [0.525 0.1 0.45 0.8]);
     
     %the two titles for each plot
     uicontrol('tag','pla','Parent',hfig,'Style','Text','Units','normalized','Position',[0.15 0.9 0.2 0.07],'string','Planification','fontSize',20);
@@ -85,8 +85,10 @@ rosinit
 %resolution (scale factor)
 res=1;
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% CSV READING AND MAP GENERATION PHASE
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %assign axes for astar
-hfig = findobj('tag','path');
 axes_astar = findobj('tag','astar');
 axes(axes_astar)
 
@@ -109,58 +111,57 @@ axis([1 MAX_X+1 1 MAX_Y+1])
 grid on;
 grid minor;
 hold on;
-n=0;%Number of Obstacles
 
 %detect obstacles in the CSV and store in the map also checks for
 %corners and puts an * in their sorroundings, all following the criteria
 %specified upwards
 for x=1:1:MAX_X
-        for y=1:1:MAX_Y
-            %corner placement
-            if x<MAX_X && y<MAX_Y
-                if map(x,y)==1 && map(x+1,y)==0 && map(x+1,y+1)==0 && map(x,y+1)==0
-                    MAP(x+1,y+1)=-1;
-                    MAP(x,y+1)=-1;
-                    MAP(x+1,y)=-1;
-                    plot(x+1+.5,y+1+.5,'b*');
-                    plot(x+.5,y+1+.5,'b*');
-                    plot(x+1+.5,y+.5,'b*');
-                end
-                if map(x,y)==0 && map(x+1,y)==1 && map(x+1,y+1)==0 && map(x,y+1)==0
-                    MAP(x,y)=-1;
-                    MAP(x,y+1)=-1;
-                    MAP(x+1,y+1)=-1;
-                    plot(x+.5,y+.5,'b*');
-                    plot(x+.5,y+1+.5,'b*');
-                    plot(x+1+.5,y+1+.5,'b*');          
-                end
-                if map(x,y)==0 && map(x+1,y)==0 && map(x+1,y+1)==1 && map(x,y+1)==0
-                    MAP(x,y)=-1;
-                    MAP(x,y+1)=-1;
-                    MAP(x+1,y)=-1;
-                    plot(x+1+.5,y+.5,'b*');
-                    plot(x+.5,y+1+.5,'b*');
-                    plot(x+.5,y+.5,'b*');        
-                end
-                if map(x,y)==0 && map(x+1,y)==0 && map(x+1,y+1)==0 && map(x,y+1)==1
-                    MAP(x+1,y+1)=-1;
-                    MAP(x,y)=-1;
-                    MAP(x+1,y)=-1;
-                    plot(x+1+.5,y+1+.5,'b*');
-                    plot(x+.5,y+.5,'b*');
-                    plot(x+1+.5,y+.5,'b*');          
-                end
+    for y=1:1:MAX_Y
+        %corner placement
+        if x<MAX_X && y<MAX_Y
+            if map(x,y)==1 && map(x+1,y)==0 && map(x+1,y+1)==0 && map(x,y+1)==0
+                MAP(x+1,y+1)=-1;
+                MAP(x,y+1)=-1;
+                MAP(x+1,y)=-1;
+                plot(x+1+.5,y+1+.5,'b*');
+                plot(x+.5,y+1+.5,'b*');
+                plot(x+1+.5,y+.5,'b*');
             end
-           %obstacle placement
-           if map(x,y)==1
-                xval=x;
-                yval=y;
-                MAP(xval,yval)=-1;
-                plot(xval+.5,yval+.5,'ro');
-           end
-            
+            if map(x,y)==0 && map(x+1,y)==1 && map(x+1,y+1)==0 && map(x,y+1)==0
+                MAP(x,y)=-1;
+                MAP(x,y+1)=-1;
+                MAP(x+1,y+1)=-1;
+                plot(x+.5,y+.5,'b*');
+                plot(x+.5,y+1+.5,'b*');
+                plot(x+1+.5,y+1+.5,'b*');          
+            end
+            if map(x,y)==0 && map(x+1,y)==0 && map(x+1,y+1)==1 && map(x,y+1)==0
+                MAP(x,y)=-1;
+                MAP(x,y+1)=-1;
+                MAP(x+1,y)=-1;
+                plot(x+1+.5,y+.5,'b*');
+                plot(x+.5,y+1+.5,'b*');
+                plot(x+.5,y+.5,'b*');        
+            end
+            if map(x,y)==0 && map(x+1,y)==0 && map(x+1,y+1)==0 && map(x,y+1)==1
+                MAP(x+1,y+1)=-1;
+                MAP(x,y)=-1;
+                MAP(x+1,y)=-1;
+                plot(x+1+.5,y+1+.5,'b*');
+                plot(x+.5,y+.5,'b*');
+                plot(x+1+.5,y+.5,'b*');          
+            end
         end
+       %obstacle placement
+       if map(x,y)==1
+            xval=x;
+            yval=y;
+            MAP(xval,yval)=-1;
+            plot(xval+.5,yval+.5,'ro');
+       end
+
     end
+end
     
 
 % BEGIN Interactive Obstacle, Target, Start Location selection
@@ -206,7 +207,7 @@ yval=yStart;
 %starts the A* and navigation phase so we start counting time
 tic
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%LISTS USED FOR ALGORITHM
+%START A* PHASE
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %OPEN LIST STRUCTURE
 %--------------------------------------------------------------------------
@@ -248,9 +249,7 @@ CLOSED(CLOSED_COUNT,1)=xNode;
 CLOSED(CLOSED_COUNT,2)=yNode;
 NoPath=1;
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% START ALGORITHM
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% START A*
 while((xNode ~= xTarget || yNode ~= yTarget) && NoPath == 1)
 %  plot(xNode+.5,yNode+.5,'go');
  exp_array=expand_array(xNode,yNode,path_cost,xTarget,yTarget,CLOSED,MAX_X,MAX_Y);
@@ -275,20 +274,17 @@ while((xNode ~= xTarget || yNode ~= yTarget) && NoPath == 1)
                 OPEN(j,5)=yNode;
                 OPEN(j,6)=exp_array(i,3);
                 OPEN(j,7)=exp_array(i,4);
-            end;%End of minimum fn check
+            end%End of minimum fn check
             flag=1;
-        end;%End of node check
+        end%End of node check
 %         if flag == 1
 %             break;
-    end;%End of j for
+    end%End of j for
     if flag == 0
         OPEN_COUNT = OPEN_COUNT+1;
         OPEN(OPEN_COUNT,:)=insert_open(exp_array(i,1),exp_array(i,2),xNode,yNode,exp_array(i,3),exp_array(i,4),exp_array(i,5));
-     end;%End of insert new element into the OPEN list
- end;%End of i for
- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
- %END OF WHILE LOOP
- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    end%End of insert new element into the OPEN list
+ end%End of i for
  %Find out the node with the smallest fn 
   index_min_node = min_fn(OPEN,OPEN_COUNT,xTarget,yTarget);
   if (index_min_node ~= -1)    
@@ -304,8 +300,8 @@ while((xNode ~= xTarget || yNode ~= yTarget) && NoPath == 1)
   else
       %No path exists to the Target!!
       NoPath=0;%Exits the loop!
-  end;%End of index_min_node check
-end;%End of While Loop
+  end%End of index_min_node check
+end%End of While Loop
 %Once algorithm has run The optimal path is generated by starting of at the
 %last node(if it is the target node) and then identifying its parent node
 %until it reaches the start node.This is the optimal path
@@ -333,7 +329,7 @@ if ( (xval == xTarget) && (yval == yTarget))
            parent_x=OPEN(inode,4);%node_index returns the index of the node
            parent_y=OPEN(inode,5);
            i=i+1;
-    end;
+   end
  j=size(Optimal_path,1);
  %Plot the Optimal Path!
  p=plot(Optimal_path(j,1)+.5,Optimal_path(j,2)+.5,'bo');
@@ -440,6 +436,9 @@ rosshutdown;
 %start a new node
 rosinit;
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% CSV READING AND MAP GENERATION
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %resolution (scale factor)
 res=1;
 %assign axes for astar
@@ -564,9 +563,10 @@ yval=yStart;
 %End of map composition and start timing
 tic
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% A* PHASE
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %LISTS USED FOR ALGORITHM
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %OPEN LIST STRUCTURE
 %--------------------------------------------------------------------------
 %IS ON LIST 1/0 |X val |Y val |Parent X val |Parent Y val |h(n) |g(n)|f(n)|
@@ -607,9 +607,7 @@ CLOSED(CLOSED_COUNT,1)=xNode;
 CLOSED(CLOSED_COUNT,2)=yNode;
 NoPath=1;
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% START ALGORITHM
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%START A*
 while((xNode ~= xTarget || yNode ~= yTarget) && NoPath == 1)
 %  plot(xNode+.5,yNode+.5,'go');
  exp_array=expand_array(xNode,yNode,path_cost,xTarget,yTarget,CLOSED,MAX_X,MAX_Y);
@@ -645,9 +643,7 @@ while((xNode ~= xTarget || yNode ~= yTarget) && NoPath == 1)
         OPEN(OPEN_COUNT,:)=insert_open(exp_array(i,1),exp_array(i,2),xNode,yNode,exp_array(i,3),exp_array(i,4),exp_array(i,5));
      end;%End of insert new element into the OPEN list
  end;%End of i for
- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
- %END OF WHILE LOOP
- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
  %Find out the node with the smallest fn 
   index_min_node = min_fn(OPEN,OPEN_COUNT,xTarget,yTarget);
   if (index_min_node ~= -1)    
@@ -709,6 +705,10 @@ else
  h=msgbox('Sorry, No path exists to the Target!','warn');
  uiwait(h,5);
 end
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%PATH MODIFICATION PHASE
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %INITIAL CORRECTIONS
 %we need to flip the outputed path as its inverse

@@ -11,7 +11,7 @@ if (isempty(hfig))
 	% create figure
 	hfig = figure;
 	set(hfig,'numbertitle','off');               % erase figure number
-	set(hfig,'name',['Path planning']);
+	set(hfig,'name','Path planning');
 	set(hfig,'MenuBar','none');                  % erase menu
 	set(hfig,'doublebuffer','on');               % two graphic buffers
 	set(hfig,'CloseRequestFcn',@close)          % close request function (close window)
@@ -41,7 +41,7 @@ function new()
 % crer el figure
 	hfig = figure;
 	set(hfig,'numbertitle','off');               % erase figure number
-	set(hfig,'name',['Path planning']);
+	set(hfig,'name','Path planning');
 	set(hfig,'MenuBar','none');                  % erase menus and buttons
 	set(hfig,'doublebuffer','on');               % two graphic buffers
 	set(hfig,'CloseRequestFcn',@close)          % function close request
@@ -58,8 +58,8 @@ function new()
         uimenu(hmenu,'Label','&non-improved algorithm','Callback',@start_noimprove,'separator','on','Accelerator','S');
     
     %the two plots
-    astar_axes = axes('tag','astar','unit', 'normalized', 'position', [0.025 0.1 0.45 0.8]); 
-    nav_axes = axes('tag','nav','unit', 'normalized', 'position', [0.525 0.1 0.45 0.8]);
+    axes('tag','astar','unit', 'normalized', 'position', [0.025 0.1 0.45 0.8]); 
+    axes('tag','nav','unit', 'normalized', 'position', [0.525 0.1 0.45 0.8]);
     
     %the two titles for each plot
     uicontrol('tag','pla','Parent',hfig,'Style','Text','Units','normalized','Position',[0.15 0.9 0.2 0.07],'string','Planification','fontSize',20);
@@ -86,10 +86,9 @@ rosinit
 res=1;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% START ALGORITHM
+% CSV READING AND MAP GENERATION PHASE
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %assign axes for astar
-hfig = findobj('tag','path');
 axes_astar = findobj('tag','astar');
 axes(axes_astar)
 
@@ -112,58 +111,57 @@ axis([1 MAX_X+1 1 MAX_Y+1])
 grid on;
 grid minor;
 hold on;
-n=0;%Number of Obstacles
 
 %detect obstacles in the CSV and store in the map also checks for
 %corners and puts an * in their sorroundings, all following the criteria
 %specified upwards
 for x=1:1:MAX_X
-        for y=1:1:MAX_Y
-            %corner placement
-            if x<MAX_X && y<MAX_Y
-                if map(x,y)==1 && map(x+1,y)==0 && map(x+1,y+1)==0 && map(x,y+1)==0
-                    MAP(x+1,y+1)=-1;
-                    MAP(x,y+1)=-1;
-                    MAP(x+1,y)=-1;
-                    plot(x+1+.5,y+1+.5,'b*');
-                    plot(x+.5,y+1+.5,'b*');
-                    plot(x+1+.5,y+.5,'b*');
-                end
-                if map(x,y)==0 && map(x+1,y)==1 && map(x+1,y+1)==0 && map(x,y+1)==0
-                    MAP(x,y)=-1;
-                    MAP(x,y+1)=-1;
-                    MAP(x+1,y+1)=-1;
-                    plot(x+.5,y+.5,'b*');
-                    plot(x+.5,y+1+.5,'b*');
-                    plot(x+1+.5,y+1+.5,'b*');          
-                end
-                if map(x,y)==0 && map(x+1,y)==0 && map(x+1,y+1)==1 && map(x,y+1)==0
-                    MAP(x,y)=-1;
-                    MAP(x,y+1)=-1;
-                    MAP(x+1,y)=-1;
-                    plot(x+1+.5,y+.5,'b*');
-                    plot(x+.5,y+1+.5,'b*');
-                    plot(x+.5,y+.5,'b*');        
-                end
-                if map(x,y)==0 && map(x+1,y)==0 && map(x+1,y+1)==0 && map(x,y+1)==1
-                    MAP(x+1,y+1)=-1;
-                    MAP(x,y)=-1;
-                    MAP(x+1,y)=-1;
-                    plot(x+1+.5,y+1+.5,'b*');
-                    plot(x+.5,y+.5,'b*');
-                    plot(x+1+.5,y+.5,'b*');          
-                end
+    for y=1:1:MAX_Y
+        %corner placement
+        if x<MAX_X && y<MAX_Y
+            if map(x,y)==1 && map(x+1,y)==0 && map(x+1,y+1)==0 && map(x,y+1)==0
+                MAP(x+1,y+1)=-1;
+                MAP(x,y+1)=-1;
+                MAP(x+1,y)=-1;
+                plot(x+1+.5,y+1+.5,'b*');
+                plot(x+.5,y+1+.5,'b*');
+                plot(x+1+.5,y+.5,'b*');
             end
-           %obstacle placement
-           if map(x,y)==1
-                xval=x;
-                yval=y;
-                MAP(xval,yval)=-1;
-                plot(xval+.5,yval+.5,'ro');
-           end
-            
+            if map(x,y)==0 && map(x+1,y)==1 && map(x+1,y+1)==0 && map(x,y+1)==0
+                MAP(x,y)=-1;
+                MAP(x,y+1)=-1;
+                MAP(x+1,y+1)=-1;
+                plot(x+.5,y+.5,'b*');
+                plot(x+.5,y+1+.5,'b*');
+                plot(x+1+.5,y+1+.5,'b*');          
+            end
+            if map(x,y)==0 && map(x+1,y)==0 && map(x+1,y+1)==1 && map(x,y+1)==0
+                MAP(x,y)=-1;
+                MAP(x,y+1)=-1;
+                MAP(x+1,y)=-1;
+                plot(x+1+.5,y+.5,'b*');
+                plot(x+.5,y+1+.5,'b*');
+                plot(x+.5,y+.5,'b*');        
+            end
+            if map(x,y)==0 && map(x+1,y)==0 && map(x+1,y+1)==0 && map(x,y+1)==1
+                MAP(x+1,y+1)=-1;
+                MAP(x,y)=-1;
+                MAP(x+1,y)=-1;
+                plot(x+1+.5,y+1+.5,'b*');
+                plot(x+.5,y+.5,'b*');
+                plot(x+1+.5,y+.5,'b*');          
+            end
         end
+       %obstacle placement
+       if map(x,y)==1
+            xval=x;
+            yval=y;
+            MAP(xval,yval)=-1;
+            plot(xval+.5,yval+.5,'ro');
+       end
+
     end
+end
     
 
 % BEGIN Interactive Obstacle, Target, Start Location selection
@@ -276,17 +274,17 @@ while((xNode ~= xTarget || yNode ~= yTarget) && NoPath == 1)
                 OPEN(j,5)=yNode;
                 OPEN(j,6)=exp_array(i,3);
                 OPEN(j,7)=exp_array(i,4);
-            end;%End of minimum fn check
+            end%End of minimum fn check
             flag=1;
-        end;%End of node check
+        end%End of node check
 %         if flag == 1
 %             break;
-    end;%End of j for
+    end%End of j for
     if flag == 0
         OPEN_COUNT = OPEN_COUNT+1;
         OPEN(OPEN_COUNT,:)=insert_open(exp_array(i,1),exp_array(i,2),xNode,yNode,exp_array(i,3),exp_array(i,4),exp_array(i,5));
-     end;%End of insert new element into the OPEN list
- nd;%End of i for
+    end%End of insert new element into the OPEN list
+ end%End of i for
  %Find out the node with the smallest fn 
   index_min_node = min_fn(OPEN,OPEN_COUNT,xTarget,yTarget);
   if (index_min_node ~= -1)    
@@ -302,8 +300,8 @@ while((xNode ~= xTarget || yNode ~= yTarget) && NoPath == 1)
   else
       %No path exists to the Target!!
       NoPath=0;%Exits the loop!
-  end;%End of index_min_node check
-end;%End of While Loop
+  end%End of index_min_node check
+end%End of While Loop
 %Once algorithm has run The optimal path is generated by starting of at the
 %last node(if it is the target node) and then identifying its parent node
 %until it reaches the start node.This is the optimal path
@@ -318,7 +316,7 @@ Optimal_path(i,2)=yval;
 i=i+1;
 
 if ( (xval == xTarget) && (yval == yTarget))
-    inode=0;
+   inode=0;
    %Traverse OPEN and determine the parent nodes
    parent_x=OPEN(node_index(OPEN,xval,yval),4);%node_index returns the index of the node
    parent_y=OPEN(node_index(OPEN,xval,yval),5);
@@ -331,7 +329,7 @@ if ( (xval == xTarget) && (yval == yTarget))
            parent_x=OPEN(inode,4);%node_index returns the index of the node
            parent_y=OPEN(inode,5);
            i=i+1;
-    end;
+   end
  j=size(Optimal_path,1);
  %Plot the Optimal Path!
  p=plot(Optimal_path(j,1)+.5,Optimal_path(j,2)+.5,'bo');
@@ -341,7 +339,7 @@ if ( (xval == xTarget) && (yval == yTarget))
   pause(.25);
   set(p,'XData',Optimal_path(i,1)+.5,'YData',Optimal_path(i,2)+.5);
  drawnow ;
- end;
+ end
  plot(Optimal_path(:,1)+.5,Optimal_path(:,2)+.5);
 else
  pause(1);
@@ -406,7 +404,7 @@ while (pose(1)~=xTarget && pose(2)~=yTarget)
     %draw slam map
     plotData(plotobj,pose,laserdata);
     hold on 
-    h= plot(Optimal_path(:,1), Optimal_path(:,2),'k--d');
+    plot(Optimal_path(:,1), Optimal_path(:,2),'k--d');
     [dataWorld]=plotData(plotobj,pose,laserdata);
     if ~isempty(laserdata)
         setOccupancy(map_slam,dataWorld,1);
@@ -473,52 +471,52 @@ hold on;
 %detect obstacles in the CSV and store them in the A* map also checks for
 %corners and puts an * in their sorroundings
 for x=1:1:MAX_X
-        for y=1:1:MAX_Y
-            %corner detection
-            if x<MAX_X && y<MAX_Y
-                if map(x,y)==1 && map(x+1,y)==0 && map(x+1,y+1)==0 && map(x,y+1)==0
-                    MAP(x+1,y+1)=-1;
-                    MAP(x,y+1)=-1;
-                    MAP(x+1,y)=-1;
-                    plot(x+1+.5,y+1+.5,'b*');
-                    plot(x+.5,y+1+.5,'b*');
-                    plot(x+1+.5,y+.5,'b*');
-                end
-                if map(x,y)==0 && map(x+1,y)==1 && map(x+1,y+1)==0 && map(x,y+1)==0
-                    MAP(x,y)=-1;
-                    MAP(x,y+1)=-1;
-                    MAP(x+1,y+1)=-1;
-                    plot(x+.5,y+.5,'b*');
-                    plot(x+.5,y+1+.5,'b*');
-                    plot(x+1+.5,y+1+.5,'b*');          
-                end
-                if map(x,y)==0 && map(x+1,y)==0 && map(x+1,y+1)==1 && map(x,y+1)==0
-                    MAP(x,y)=-1;
-                    MAP(x,y+1)=-1;
-                    MAP(x+1,y)=-1;
-                    plot(x+1+.5,y+.5,'b*');
-                    plot(x+.5,y+1+.5,'b*');
-                    plot(x+.5,y+.5,'b*');        
-                end
-                if map(x,y)==0 && map(x+1,y)==0 && map(x+1,y+1)==0 && map(x,y+1)==1
-                    MAP(x+1,y+1)=-1;
-                    MAP(x,y)=-1;
-                    MAP(x+1,y)=-1;
-                    plot(x+1+.5,y+1+.5,'b*');
-                    plot(x+.5,y+.5,'b*');
-                    plot(x+1+.5,y+.5,'b*');          
-                end
-            end    
-           %wall detection
-           if map(x,y)==1
-                xval=x;
-                yval=y;
-                MAP(xval,yval)=-1;
-                plot(xval+.5,yval+.5,'ro');
-           end
-            
-        end
+    for y=1:1:MAX_Y
+        %corner detection
+        if x<MAX_X && y<MAX_Y
+            if map(x,y)==1 && map(x+1,y)==0 && map(x+1,y+1)==0 && map(x,y+1)==0
+                MAP(x+1,y+1)=-1;
+                MAP(x,y+1)=-1;
+                MAP(x+1,y)=-1;
+                plot(x+1+.5,y+1+.5,'b*');
+                plot(x+.5,y+1+.5,'b*');
+                plot(x+1+.5,y+.5,'b*');
+            end
+            if map(x,y)==0 && map(x+1,y)==1 && map(x+1,y+1)==0 && map(x,y+1)==0
+                MAP(x,y)=-1;
+                MAP(x,y+1)=-1;
+                MAP(x+1,y+1)=-1;
+                plot(x+.5,y+.5,'b*');
+                plot(x+.5,y+1+.5,'b*');
+                plot(x+1+.5,y+1+.5,'b*');          
+            end
+            if map(x,y)==0 && map(x+1,y)==0 && map(x+1,y+1)==1 && map(x,y+1)==0
+                MAP(x,y)=-1;
+                MAP(x,y+1)=-1;
+                MAP(x+1,y)=-1;
+                plot(x+1+.5,y+.5,'b*');
+                plot(x+.5,y+1+.5,'b*');
+                plot(x+.5,y+.5,'b*');        
+            end
+            if map(x,y)==0 && map(x+1,y)==0 && map(x+1,y+1)==0 && map(x,y+1)==1
+                MAP(x+1,y+1)=-1;
+                MAP(x,y)=-1;
+                MAP(x+1,y)=-1;
+                plot(x+1+.5,y+1+.5,'b*');
+                plot(x+.5,y+.5,'b*');
+                plot(x+1+.5,y+.5,'b*');          
+            end
+        end    
+       %wall detection
+       if map(x,y)==1
+            xval=x;
+            yval=y;
+            MAP(xval,yval)=-1;
+            plot(xval+.5,yval+.5,'ro');
+       end
+
     end
+end
     
 
 % BEGIN Interactive Obstacle, Target, Start Location selection
@@ -634,17 +632,17 @@ while((xNode ~= xTarget || yNode ~= yTarget) && NoPath == 1)
                 OPEN(j,5)=yNode;
                 OPEN(j,6)=exp_array(i,3);
                 OPEN(j,7)=exp_array(i,4);
-            end;%End of minimum fn check
+            end%End of minimum fn check
             flag=1;
-        end;%End of node check
+        end%End of node check
 %         if flag == 1
 %             break;
-    end;%End of j for
+    end%End of j for
     if flag == 0
         OPEN_COUNT = OPEN_COUNT+1;
         OPEN(OPEN_COUNT,:)=insert_open(exp_array(i,1),exp_array(i,2),xNode,yNode,exp_array(i,3),exp_array(i,4),exp_array(i,5));
-     end;%End of insert new element into the OPEN list
- end;%End of i for
+    end%End of insert new element into the OPEN list
+ end%End of i for
 
  %Find out the node with the smallest fn 
   index_min_node = min_fn(OPEN,OPEN_COUNT,xTarget,yTarget);
@@ -661,8 +659,8 @@ while((xNode ~= xTarget || yNode ~= yTarget) && NoPath == 1)
   else
       %No path exists to the Target!!
       NoPath=0;%Exits the loop!
-  end;%End of index_min_node check
-end;%End of While Loop
+  end%End of index_min_node check
+end%End of While Loop
 %Once algorithm has run The optimal path is generated by starting of at the
 %last node(if it is the target node) and then identifying its parent node
 %until it reaches the start node.This is the optimal path
@@ -961,7 +959,7 @@ while (pose(1)~=xTarget && pose(2)~=yTarget)
     %draw slam map
     plotData(plotobj,pose,laserdata);
     hold on 
-    h= plot(Optimal_path(:,1), Optimal_path(:,2),'k--d');
+    plot(Optimal_path(:,1), Optimal_path(:,2),'k--d');
     [dataWorld]=plotData(plotobj,pose,laserdata);
     if ~isempty(laserdata)
         setOccupancy(map_slam,dataWorld,1);
