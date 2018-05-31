@@ -7,7 +7,7 @@ Run the file Start.m with matlab
 
 **video playlist with all the maps**
 
-Videos for the PTMR-2018 repo maps from 8 to 9 all at x1 speed except map4 x2
+Videos for the PTMR-2018 repo maps from 1 to 9 all at x1 speed except map4 x2
 The duration of each video is about 30s
 https://www.youtube.com/playlist?list=PLD6B0sWQfXtMeKobvsBmHz5OEAu9mkbeM
 
