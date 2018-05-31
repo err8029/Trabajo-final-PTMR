@@ -1,4 +1,4 @@
-# Trabajo-final-PTMR
+# Trabajo-final-PTMR GRUPO 7 2018
 A* with enhanced navigation and planning algorithm it includes a GUI and a not so enhanced version. It navigated through all maps that have been tested succesfully.
 
 **Execution**
