@@ -3,7 +3,7 @@ A* with enhanced navigation and planning algorithm it includes a GUI and a not s
 
 **Execution**
 
-Run the file Start.m with matlab
+Run the file Start.m with matlab, and in the upper menu, hit the option "improved algorithm" for the one that takes into account straight lines and distances. For the one with less imporvments hit the "non improved algorithm" button, both of them work perfectly.
 
 **video playlist with all the maps**
 
